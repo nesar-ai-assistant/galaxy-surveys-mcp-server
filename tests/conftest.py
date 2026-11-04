@@ -1,5 +1,4 @@
 """pytest configuration: add custom markers."""
-import pytest
 
 
 def pytest_configure(config):

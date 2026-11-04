@@ -26,6 +26,7 @@ dev = ["pytest", "anyio", "ruff"]
 [tool.mcp-server]
 name = "Galaxy Surveys (BAO/RSD + SDSS) MCP Server"
 skill_prefix = "galaxy"
+port = 8011
 instructions_file = "mcp_server/INSTRUCTIONS.md"
 tool_modules = [
     "tools.meta",
