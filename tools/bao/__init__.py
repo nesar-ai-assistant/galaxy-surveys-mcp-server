@@ -11,7 +11,7 @@ from typing import Annotated
 import numpy as np
 from pydantic import Field, validate_call
 
-from ..common import ArtifactResult, ok, resolve_outdir, mpl, save_fig
+from ..common import ArtifactResult, ok, resolve_outdir, mpl, save_fig, tier
 
 __all__ = [
     "fetch_bao_measurements",
@@ -65,6 +65,7 @@ def _planck_lcdm(z, quantity):
     return None
 
 
+@tier(2)
 @validate_call
 def fetch_bao_measurements(
     output_dir: Annotated[str, Field(description="Directory for output files.")],
@@ -98,6 +99,7 @@ def fetch_bao_measurements(
     )
 
 
+@tier(2)
 @validate_call
 def plot_bao_distances(
     output_dir: Annotated[str, Field(description="Directory for output files.")],
@@ -156,6 +158,7 @@ def plot_bao_distances(
     return ok("BAO distance plot.", [path])
 
 
+@tier(2)
 @validate_call
 def fit_bao_cosmology(
     output_dir: Annotated[str, Field(description="Directory for output files.")],
@@ -228,6 +231,7 @@ def fit_bao_cosmology(
 fit_bao_cosmology.weight = "heavy"
 
 
+@tier(2)
 @validate_call
 def plot_bao_contours(
     output_dir: Annotated[str, Field(description="Directory for output files.")],
@@ -263,6 +267,7 @@ def plot_bao_contours(
     return ok("BAO contour plot.", [path])
 
 
+@tier(2)
 @validate_call
 def plot_fsigma8(
     output_dir: Annotated[str, Field(description="Directory for output files.")],
@@ -302,15 +307,17 @@ def plot_fsigma8(
     return ok("f*sigma8 plot.", [path])
 
 
+@tier(3)
 @validate_call
 def compare_bao_surveys(
     output_dir: Annotated[str, Field(description="Directory for output files.")],
     datasets: Annotated[str, Field(description="Comma-separated BAO dataset keys")] = "desi_dr2,desi_dr1,boss_dr12_bao",
 ) -> ArtifactResult:
-    """Compare BAO measurements across surveys: residuals relative to Planck LCDM.
+    """Compare BAO measurements across surveys: residuals relative to Planck LCDM (comparison only).
 
-    Plots (data - Planck) / error for each data point, grouped by survey.
-    Useful for spotting tensions between surveys.
+    Tier-3 comparison tool. Plots (data - Planck) / error for each data point,
+    grouped by survey. Useful for spotting tensions between surveys.
+    The Planck LCDM curve is a published-inference reference line.
     """
     plt = mpl()
     fig, ax = plt.subplots(figsize=(10, 5))

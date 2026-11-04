@@ -12,7 +12,7 @@ import numpy as np
 from pydantic import Field, validate_call
 
 from ..common import (ArtifactResult, ok, resolve_outdir, mpl, save_fig,
-                      data_cache_dir)
+                      data_cache_dir, tier)
 
 __all__ = [
     "sdss_sql_query",
@@ -61,6 +61,7 @@ def _filter_invalid(df):
     return out
 
 
+@tier(1)
 @validate_call
 def sdss_sql_query(
     output_dir: Annotated[str, Field(description="Directory for output files.")],
@@ -93,6 +94,7 @@ def sdss_sql_query(
               [path], n_rows=len(df), columns=list(df.columns))
 
 
+@tier(1)
 @validate_call
 def fetch_sdss_galaxies(
     output_dir: Annotated[str, Field(description="Directory for output files.")],
@@ -137,6 +139,7 @@ def fetch_sdss_galaxies(
               columns=list(df.columns))
 
 
+@tier(1)
 @validate_call
 def compute_sdss_absolute_magnitudes(
     output_dir: Annotated[str, Field(description="Directory for output files.")],
@@ -197,6 +200,7 @@ def compute_sdss_absolute_magnitudes(
               [path], n_rows=len(df), columns=list(df.columns))
 
 
+@tier(1)
 @validate_call
 def plot_color_magnitude(
     output_dir: Annotated[str, Field(description="Directory for output files.")],
@@ -230,6 +234,7 @@ def plot_color_magnitude(
     return ok(f"CMD plotted for {mask.sum()} galaxies.", [path])
 
 
+@tier(1)
 @validate_call
 def plot_sdss_redshift_distribution(
     output_dir: Annotated[str, Field(description="Directory for output files.")],

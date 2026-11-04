@@ -1,6 +1,6 @@
 ---
 name: hpc-dispatch-handoff
-description: Run this server's heavy kernels (bao.kernels.fit_bao — BAO chi2 grid fit) on ALCF Polaris or NERSC Perlmutter through the hep-genesis IRI engine - client-side pack export (hosted) or server-side set_dispatch (own machine)
+description: Run this server's heavy kernels (bao.kernels.fit_bao — BAO chi2 grid fit; lss.kernels.measure_xi_multipoles — correlation function measurement) on ALCF Polaris or NERSC Perlmutter through the hep-genesis IRI engine - client-side pack export (hosted) or server-side set_dispatch (own machine)
 ---
 
 # HPC dispatch handoff

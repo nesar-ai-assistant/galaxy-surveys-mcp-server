@@ -33,6 +33,7 @@ tool_modules = [
     "tools.bao",
     "tools.sdss",
     "tools.gswlc",
+    "tools.lss",
     "mcp_server.dispatch",
 ]
 
