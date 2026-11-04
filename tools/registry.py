@@ -4,18 +4,18 @@ Keys are short dataset ids used by every tool's ``dataset`` argument.
 "access" is "bundled" (file in data/), "download" (fetched on first use
 into the data cache) or "remote-query" (live service).
 
-Products are split by data tier:
-  tier1 = raw / catalog-level (per-object catalogs)
-  tier2 = processed summary statistics measured from tier-1 data
-  tier3 = published inference (comparison only)
+Products are grouped by kind of data:
+  catalog           = object-level data (galaxy catalogs, clustering catalogs + randoms)
+  summary_statistic = measurements reduced from catalogs, with covariance
+  published_result  = published inference products (comparison only)
 """
 
 DATASETS: dict[str, dict] = {
-    # ---- BAO / RSD distance measurements (tier 2) ----
+    # ---- BAO / RSD distance measurements (summary statistics) ----
     "desi_dr2": {
         "title": "DESI Data Release 2 BAO (2025)",
         "products": {
-            "tier2": ["DM/rd", "DH/rd", "DV/rd", "covariance"],
+            "summary_statistic": ["DM/rd", "DH/rd", "DV/rd", "covariance"],
         },
         "access": "bundled",
         "urls": ["https://github.com/CobayaSampler/bao_data/tree/master/desi_bao_dr2"],
@@ -26,7 +26,7 @@ DATASETS: dict[str, dict] = {
     "desi_dr1": {
         "title": "DESI Data Release 1 BAO (2024)",
         "products": {
-            "tier2": ["DM/rd", "DH/rd", "DV/rd", "covariance"],
+            "summary_statistic": ["DM/rd", "DH/rd", "DV/rd", "covariance"],
         },
         "access": "bundled",
         "urls": ["https://github.com/CobayaSampler/bao_data"],
@@ -37,9 +37,9 @@ DATASETS: dict[str, dict] = {
     "eboss_dr16": {
         "title": "eBOSS DR16 BAO + full-shape + clustering catalogs (LRG, QSO, ELG, Lya)",
         "products": {
-            "tier1": ["LRG/QSO/ELG NGC clustering catalogs + randoms"],
-            "tier2": ["DM/rd", "DH/rd", "DV/rd", "f*sigma8", "covariance",
-                      "xi(s) multipoles (LRG, QSO)", "P(k) multipoles"],
+            "catalog": ["LRG/QSO/ELG NGC clustering catalogs + randoms"],
+            "summary_statistic": ["DM/rd", "DH/rd", "DV/rd", "f*sigma8", "covariance",
+                                  "xi(s) multipoles (LRG, QSO)", "P(k) multipoles"],
         },
         "access": "bundled (BAO) / download (catalogs, multipoles)",
         "urls": ["https://github.com/CobayaSampler/bao_data",
@@ -55,9 +55,9 @@ DATASETS: dict[str, dict] = {
     "boss_dr12": {
         "title": "BOSS DR12 consensus BAO + full-shape + clustering catalogs",
         "products": {
-            "tier1": ["CMASS/LOWZ North clustering catalogs + randoms"],
-            "tier2": ["DM (Mpc)", "H*rs (km/s)", "f*sigma8", "covariance",
-                      "P(k) multipoles (Beutler+17)"],
+            "catalog": ["CMASS/LOWZ North clustering catalogs + randoms"],
+            "summary_statistic": ["DM (Mpc)", "H*rs (km/s)", "f*sigma8", "covariance",
+                                  "P(k) multipoles (Beutler+17)"],
         },
         "access": "bundled (BAO) / download (catalogs, multipoles)",
         "urls": ["https://github.com/CobayaSampler/bao_data",
@@ -74,7 +74,7 @@ DATASETS: dict[str, dict] = {
     "sdss_mgs": {
         "title": "SDSS DR7 Main Galaxy Sample BAO (z=0.15)",
         "products": {
-            "tier2": ["DV/rd 1D probability"],
+            "summary_statistic": ["DV/rd 1D probability"],
         },
         "access": "bundled",
         "urls": ["https://github.com/CobayaSampler/bao_data"],
@@ -84,7 +84,7 @@ DATASETS: dict[str, dict] = {
     "sixdf": {
         "title": "6dF Galaxy Survey BAO (z=0.106)",
         "products": {
-            "tier2": ["rs/DV point measurement"],
+            "summary_statistic": ["rs/DV point measurement"],
         },
         "access": "bundled",
         "urls": [],
@@ -92,13 +92,13 @@ DATASETS: dict[str, dict] = {
         "notes": "Single Gaussian point: rs/DV = 0.336 +/- 0.015 at z=0.106",
         "tools": ["fetch_bao_measurements", "plot_bao_distances"],
     },
-    # ---- DESI DR1 LSS clustering catalogs (tier 1) ----
+    # ---- DESI DR1 LSS clustering catalogs (data + randoms) ----
     "desi_dr1_lss": {
         "title": "DESI DR1 LSS clustering catalogs (LRG, ELG, QSO, NGC)",
         "products": {
-            "tier1": ["LRG/ELG/QSO NGC clustering catalogs + randoms (v1.5)",
-                      "official n(z)"],
-            "tier2": ["n(z) histogram", "xi(s) multipoles (user-measured)"],
+            "catalog": ["LRG/ELG/QSO NGC clustering catalogs + randoms (v1.5)",
+                        "official n(z)"],
+            "summary_statistic": ["n(z) histogram", "xi(s) multipoles (user-measured)"],
         },
         "access": "download (HTTP Range, row-limited subsets)",
         "urls": ["https://data.desi.lbl.gov/public/dr1/survey/catalogs/dr1/LSS/iron/LSScats/v1.5/"],
@@ -106,11 +106,11 @@ DATASETS: dict[str, dict] = {
         "tools": ["fetch_galaxy_lss_catalog", "measure_correlation_multipoles",
                   "compute_nz_histogram", "plot_clustering_multipoles"],
     },
-    # ---- SDSS SkyServer (tier 1) ----
+    # ---- SDSS SkyServer (galaxy catalogs) ----
     "sdss_skyserver": {
         "title": "SDSS SkyServer SQL (DR18)",
         "products": {
-            "tier1": ["spectroscopy", "photometry", "galaxy catalogs"],
+            "catalog": ["spectroscopy", "photometry", "galaxy catalogs"],
         },
         "access": "remote-query",
         "urls": ["https://skyserver.sdss.org/dr18/"],
@@ -119,11 +119,11 @@ DATASETS: dict[str, dict] = {
                   "compute_sdss_absolute_magnitudes",
                   "plot_color_magnitude", "plot_sdss_redshift_distribution"],
     },
-    # ---- GSWLC (tier 1) ----
+    # ---- GSWLC (galaxy property catalog) ----
     "gswlc_a2": {
         "title": "GALEX-SDSS-WISE Legacy Catalog A2 (GSWLC-A2)",
         "products": {
-            "tier1": ["stellar mass", "SFR", "dust attenuation", "640k galaxies"],
+            "catalog": ["stellar mass", "SFR", "dust attenuation", "640k galaxies"],
         },
         "access": "download",
         "urls": ["https://salims.pages.iu.edu/gswlc/GSWLC-A2.dat.gz"],

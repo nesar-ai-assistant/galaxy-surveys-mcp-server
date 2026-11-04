@@ -7,8 +7,8 @@ description: Quick tour of all four tool families (BAO, SDSS, GSWLC, LSS cluster
 
 Quick end-to-end demo exercising every tool family. Use one `output_dir`.
 
-Data tiers: tier 1 = raw catalogs, tier 2 = summary statistics, tier 3 = published
-inference (comparison only). Every tool has `@tier(n)`.
+Kinds of data: catalogs (object-level), summary statistics (measurements with
+covariance) and published results (for comparison only).
 
 ## 1. Discovery
 
@@ -17,7 +17,7 @@ list_galaxy_datasets()
 list_galaxy_skills()
 ```
 
-## 2. BAO family (tier 2, compare_bao_surveys is tier 3)
+## 2. BAO family (summary statistics; compare_bao_surveys overlays a published Planck reference)
 
 ```
 fetch_bao_measurements(output_dir, dataset="desi_dr2")
@@ -38,7 +38,7 @@ Sanity check: Om ~ 0.297 +/- 0.009, H0*rd ~ 101.5 km/s (DESI DR2 BAO-only).
 plot_bao_contours(output_dir, grid_file="<output_dir>/bao_fit_desi_dr2_grid.npz", dataset_label="DESI DR2")
 ```
 
-## 3. SDSS family (tier 1)
+## 3. SDSS family (galaxy catalogs)
 
 ```
 fetch_sdss_galaxies(output_dir, limit=500, min_z=0.02, max_z=0.08)
@@ -58,7 +58,7 @@ Check: bimodal distribution with red sequence (g-r ~ 0.8) and blue cloud (g-r ~ 
 plot_sdss_redshift_distribution(output_dir, input_file="<output_dir>/sdss_galaxies.csv")
 ```
 
-## 4. GSWLC family (tier 1)
+## 4. GSWLC family (galaxy property catalog)
 
 ```
 describe_gswlc_catalog()
@@ -73,9 +73,9 @@ plot_star_forming_main_sequence(output_dir, input_file="<output_dir>/gswlc_query
 ```
 Check: clear main sequence with slope ~0.76, green valley visible, quenched galaxies at logSFR < -1.
 
-## 5. LSS clustering family (tier 1 + tier 2)
+## 5. LSS clustering family (from catalogs to correlation-function multipoles)
 
-### 5a. Fetch clustering catalogs (tier 1)
+### 5a. Fetch clustering catalogs (data + randoms)
 
 ```
 fetch_galaxy_lss_catalog(output_dir, catalog="eboss_dr16_lrg_ngc", kind="data", max_rows=20000)
@@ -83,7 +83,7 @@ fetch_galaxy_lss_catalog(output_dir, catalog="eboss_dr16_lrg_ngc", kind="random"
 ```
 Expect ~20k data, ~40k randoms with RA, DEC, Z, weights.
 
-### 5b. Measure correlation multipoles (tier 2, HEAVY)
+### 5b. Measure correlation multipoles (HEAVY)
 
 ```
 measure_correlation_multipoles(output_dir,
@@ -94,13 +94,13 @@ measure_correlation_multipoles(output_dir,
 Sanity: xi_0 should show a BAO bump near s ~ 100-110 Mpc/h.
 For BOSS CMASS: xi_0(s=20 Mpc/h) should be of order 0.1-0.3.
 
-### 5c. n(z) histogram (tier 2)
+### 5c. n(z) histogram
 
 ```
 compute_nz_histogram(output_dir, catalog_file="<output_dir>/eboss_dr16_lrg_ngc_data.csv", n_bins=30)
 ```
 
-### 5d. Published multipoles (tier 2)
+### 5d. Published multipoles (survey-team measurements with covariance)
 
 ```
 fetch_published_multipoles(output_dir, dataset="boss_dr12_pk_z1_ngc")
@@ -112,7 +112,7 @@ fetch_published_multipoles(output_dir, dataset="eboss_dr16_lrg_xi")
 ```
 Expect eBOSS DR16 LRG xi_0, xi_2 with covariance.
 
-### 5e. Plot multipoles (tier 2)
+### 5e. Plot multipoles
 
 ```
 plot_clustering_multipoles(output_dir,

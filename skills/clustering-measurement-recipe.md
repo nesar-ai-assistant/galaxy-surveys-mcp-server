@@ -1,6 +1,6 @@
 ---
 name: clustering-measurement-recipe
-description: Measure galaxy clustering multipoles from raw catalogs - end-to-end recipe from tier-1 download through tier-2 xi(s) measurement, comparison with published results
+description: Measure galaxy clustering multipoles from survey catalogs - end-to-end recipe from clustering catalogs (data + randoms) to correlation-function multipoles xi(s), compared with published measurements
 ---
 
 # Clustering Measurement Recipe
@@ -14,7 +14,7 @@ Available catalogs: `eboss_dr16_lrg_ngc`, `eboss_dr16_qso_ngc`,
 `eboss_dr16_elg_ngc`, `boss_dr12_cmass_north`, `boss_dr12_lowz_north`,
 `desi_dr1_lrg_ngc`, `desi_dr1_elg_ngc`, `desi_dr1_qso_ngc`.
 
-## 1. Fetch data and random catalogs (tier 1)
+## 1. Fetch data and random catalogs
 
 ```
 fetch_galaxy_lss_catalog(output_dir, catalog="boss_dr12_cmass_north", kind="data", max_rows=30000)
@@ -24,14 +24,14 @@ Use 2x more randoms than data. For large catalogs, subsample randoms with
 `random_fraction` to keep pair-counting tractable (< 100k total objects).
 Weight columns are combined into WEIGHT_TOTAL automatically.
 
-## 2. Check n(z) (tier 2)
+## 2. Check n(z)
 
 ```
 compute_nz_histogram(output_dir, catalog_file="<data csv>", n_bins=30)
 ```
 Verify the redshift distribution matches the expected survey range.
 
-## 3. Measure multipoles (tier 2, HEAVY)
+## 3. Measure multipoles (HEAVY)
 
 ```
 measure_correlation_multipoles(output_dir,
@@ -47,7 +47,7 @@ Can be dispatched to HPC via `set_dispatch("polaris")`.
 - **eBOSS LRG**: similar BAO feature but noisier for small subsets
 - **DESI LRG**: strong BAO signal with larger sample
 
-## 4. Compare with published multipoles (tier 2)
+## 4. Compare with published multipoles
 
 ```
 fetch_published_multipoles(output_dir, dataset="boss_dr12_pk_z1_ngc")
@@ -61,7 +61,7 @@ Available published datasets:
 - `eboss_dr16_lrg_xi`: eBOSS DR16 LRG xi(s) NGC+SGC (monopole + quadrupole + covariance)
 - `eboss_dr16_qso_xi`: eBOSS DR16 QSO xi(s) NGC+SGC
 
-## 5. Plot comparison (tier 2)
+## 5. Plot comparison
 
 ```
 plot_clustering_multipoles(output_dir,

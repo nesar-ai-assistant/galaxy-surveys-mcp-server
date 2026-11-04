@@ -14,7 +14,7 @@ from typing import Annotated
 import numpy as np
 from pydantic import Field, validate_call
 
-from ..common import (ArtifactResult, ok, resolve_outdir, mpl, save_fig, tier,
+from ..common import (ArtifactResult, ok, resolve_outdir, mpl, save_fig, data_kind,
                       data_cache_dir, fetch_file, get_cached)
 
 __all__ = [
@@ -114,7 +114,7 @@ def _apply_filters(df, filters: dict):
     return df
 
 
-@tier(1)
+@data_kind("catalog")
 @validate_call
 def query_gswlc_catalog(
     output_dir: Annotated[str, Field(description="Directory for output files.")],
@@ -159,7 +159,7 @@ def query_gswlc_catalog(
               [path], n_rows=len(df), columns=list(df.columns))
 
 
-@tier(1)
+@data_kind("catalog")
 @validate_call
 def describe_gswlc_catalog() -> ArtifactResult:
     """Describe the GSWLC-A2 catalog: columns, types, and filter syntax.
@@ -183,7 +183,7 @@ def describe_gswlc_catalog() -> ArtifactResult:
     )
 
 
-@tier(1)
+@data_kind("catalog")
 @validate_call
 def plot_star_forming_main_sequence(
     output_dir: Annotated[str, Field(description="Directory for output files.")],
@@ -239,7 +239,7 @@ def plot_star_forming_main_sequence(
     return ok(f"Star-forming main sequence plotted for {len(df)} galaxies.", [path])
 
 
-@tier(1)
+@data_kind("catalog")
 @validate_call
 def crossmatch_sdss_gswlc(
     output_dir: Annotated[str, Field(description="Directory for output files.")],

@@ -104,7 +104,7 @@ LSS_CATALOGS: dict[str, dict] = {
     },
 }
 
-# ---------- released multipole files (tier 2) ---------------------------------
+# ---------- released multipole files (summary statistics) ---------------------
 
 # BOSS DR12 Beutler+17 P(k) multipoles (fullshape prerecon)
 PUBLISHED_MULTIPOLES: dict[str, dict] = {

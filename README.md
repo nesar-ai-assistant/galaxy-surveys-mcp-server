@@ -7,41 +7,41 @@ structure clustering catalogs with correlation function measurements.
 
 Part of the `cosmo-*-mcp-server` family (port 8011).
 
-## Data Tiers
+## Data products
 
-| Tier | Description | Examples |
-|------|-------------|----------|
-| **1** | Raw / catalog-level data | SDSS SkyServer queries, GSWLC-A2 (640k galaxies), eBOSS/BOSS/DESI clustering catalogs + randoms |
-| **2** | Summary statistics with covariance | BAO D/rd, f·σ₈, P(k)/ξ(s) multipoles (Beutler+17, eBOSS DR16 datavecs), n(z), user-measured ξ₀(s), ξ₂(s) |
-| **3** | Published inference (comparison only) | Planck LCDM reference curves in BAO plots |
+| Catalogs | Summary statistics | Published results (for comparison only) |
+|----------|--------------------|-----------------------------------------|
+| SDSS SkyServer queries, GSWLC-A2 (640k galaxies), eBOSS/BOSS/DESI clustering catalogs (data + randoms) | BAO D/rd, f·σ₈, P(k)/ξ(s) multipoles with covariance (Beutler+17, eBOSS DR16 datavecs), n(z), user-measured ξ₀(s), ξ₂(s) | Planck ΛCDM reference curves in BAO plots |
 
-Every tool is decorated `@tier(n)`. Heavy tier 1→2 reductions (`measure_correlation_multipoles`,
-`fit_bao_cosmology`) are dispatchable kernels.
+Every tool declares the kind of data it works on with `@data_kind(...)` (`catalog`,
+`summary_statistic`, `published_result`; see `docs/CONVENTIONS.md`). Heavy reductions
+(from catalogs to correlation-function multipoles in `measure_correlation_multipoles`, and the
+`fit_bao_cosmology` grid) are dispatchable kernels.
 
 ## Tool Families
 
-### BAO (`tools/bao/`) — tier 2/3
+### BAO (`tools/bao/`) — summary statistics
 - `fetch_bao_measurements` — load BAO distance data from bundled files
 - `plot_bao_distances` — Hubble diagram (D/rd vs z) with Planck LCDM
 - `fit_bao_cosmology` — chi2 grid fit for Om, H0*rd (LCDM or w0waCDM) **[HEAVY]**
 - `plot_bao_contours` — Om-H0*rd contour plot from fit grid
 - `plot_fsigma8` — f*sigma8(z) growth-rate measurements
-- `compare_bao_surveys` — residuals vs Planck LCDM across surveys *(tier 3)*
+- `compare_bao_surveys` — residuals vs Planck LCDM across surveys *(published Planck reference, for comparison only)*
 
-### SDSS (`tools/sdss/`) — tier 1
+### SDSS (`tools/sdss/`) — galaxy catalogs
 - `sdss_sql_query` — execute SQL on SDSS SkyServer DR18
 - `fetch_sdss_galaxies` — spectro-photometric galaxy catalog
 - `compute_sdss_absolute_magnitudes` — extinction correction + absolute mags + colours
 - `plot_color_magnitude` — colour-magnitude diagram (red sequence / blue cloud)
 - `plot_sdss_redshift_distribution` — N(z) histogram
 
-### GSWLC (`tools/gswlc/`) — tier 1
+### GSWLC (`tools/gswlc/`) — galaxy property catalog
 - `query_gswlc_catalog` — query GSWLC-A2 with filters (640k galaxies)
 - `describe_gswlc_catalog` — column descriptions and filter syntax
 - `plot_star_forming_main_sequence` — SFR vs M* density plot
 - `crossmatch_sdss_gswlc` — match SDSS with GSWLC on ObjID or sky coords
 
-### LSS Clustering (`tools/lss/`) — tier 1 + 2
+### LSS Clustering (`tools/lss/`) — clustering catalogs and multipoles
 - `fetch_galaxy_lss_catalog` — download subsets of eBOSS DR16 / BOSS DR12 / DESI DR1
   clustering catalogs (data or randoms, row-limited, z-filtered) via HTTP Range
 - `measure_correlation_multipoles` — Landy-Szalay ξ₀(s), ξ₂(s) from data+randoms

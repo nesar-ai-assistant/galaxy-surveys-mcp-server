@@ -83,7 +83,7 @@ def test_published_multipoles_registry():
         assert "data_urls" in entry
 
 
-# ---------- tool __all__ and tier decorators ----------------------------------
+# ---------- tool __all__ and data-kind decorators -----------------------------
 
 def test_lss_tools_in_all():
     """All 5 LSS tools are listed in __all__."""
@@ -98,13 +98,14 @@ def test_lss_tools_in_all():
     assert expected == set(__all__)
 
 
-def test_lss_tools_have_tier():
-    """Every LSS tool has a data_tier attribute from the @tier() decorator."""
+def test_lss_tools_have_data_kind():
+    """Every LSS tool has a data_kind attribute from the @data_kind() decorator."""
     import tools.lss as lss
     for name in lss.__all__:
         fn = getattr(lss, name)
-        assert hasattr(fn, "data_tier"), f"{name} missing @tier() decorator"
-        assert fn.data_tier in (1, 2, 3), f"{name} has invalid tier: {fn.data_tier}"
+        assert hasattr(fn, "data_kind"), f"{name} missing @data_kind() decorator"
+        assert fn.data_kind in ("catalog", "summary_statistic", "published_result"), \
+            f"{name} has invalid data kind: {fn.data_kind}"
 
 
 def test_lss_dispatch_kernels():

@@ -1,8 +1,8 @@
 """LSS clustering catalog tool family: fetch catalogs, measure multipoles, plot.
 
-Tier 1: fetch_galaxy_lss_catalog (raw galaxy + random catalogs)
-Tier 2: measure_correlation_multipoles, compute_nz_histogram,
-        fetch_published_multipoles, plot_clustering_multipoles
+Clustering catalogs (data + randoms): fetch_galaxy_lss_catalog
+Summary statistics: measure_correlation_multipoles, compute_nz_histogram,
+                    fetch_published_multipoles, plot_clustering_multipoles
 """
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from typing import Annotated
 import numpy as np
 from pydantic import Field, validate_call
 
-from ..common import ArtifactResult, ok, resolve_outdir, mpl, save_fig, tier
+from ..common import ArtifactResult, ok, resolve_outdir, mpl, save_fig, data_kind
 
 __all__ = [
     "fetch_galaxy_lss_catalog",
@@ -43,7 +43,7 @@ _PUBLISHED_KEYS = [
 ]
 
 
-@tier(1)
+@data_kind("catalog")
 @validate_call
 def fetch_galaxy_lss_catalog(
     output_dir: Annotated[str, Field(description="Directory for output files.")],
@@ -61,8 +61,8 @@ def fetch_galaxy_lss_catalog(
     """Fetch a subset of a galaxy clustering catalog (data or randoms) from BOSS/eBOSS/DESI.
 
     Downloads on demand via HTTP Range (partial) for uncompressed FITS or streaming for
-    gzipped FITS. Returns RA, DEC, Z, weights as CSV. Use this to get raw tier-1 data
-    for correlation function measurement.
+    gzipped FITS. Returns RA, DEC, Z, weights as CSV. Use this to get clustering
+    catalogs (data + randoms) for correlation function measurement.
 
     Catalogs include eBOSS DR16 LRG/QSO/ELG (NGC), BOSS DR12 CMASS/LOWZ (North),
     and DESI DR1 LRG/ELG/QSO (NGC). Each comes with systematic + FKP weights.
@@ -87,7 +87,7 @@ def fetch_galaxy_lss_catalog(
     )
 
 
-@tier(2)
+@data_kind("summary_statistic")
 @validate_call
 def measure_correlation_multipoles(
     output_dir: Annotated[str, Field(description="Directory for output files.")],
@@ -98,8 +98,8 @@ def measure_correlation_multipoles(
 ) -> ArtifactResult:
     """Measure correlation function multipoles xi_0(s), xi_2(s) from data+random catalogs.
 
-    This is a HEAVY tier-1 to tier-2 reduction. Uses Landy-Szalay estimator with FKP +
-    systematic weights. Uses Corrfunc if available, else scipy cKDTree pair-counting.
+    This is a HEAVY reduction from catalogs to correlation-function multipoles. Uses the
+    Landy-Szalay estimator with FKP + systematic weights. Uses Corrfunc if available, else scipy cKDTree pair-counting.
 
     Sanity check: for BOSS CMASS, expect BAO bump near s ~ 100-110 Mpc/h in xi_0,
     and xi_0(s=20 Mpc/h) of order 0.1-0.3. Can be dispatched to HPC.
@@ -155,7 +155,7 @@ def measure_correlation_multipoles(
 measure_correlation_multipoles.weight = "heavy"
 
 
-@tier(2)
+@data_kind("summary_statistic")
 @validate_call
 def compute_nz_histogram(
     output_dir: Annotated[str, Field(description="Directory for output files.")],
@@ -165,7 +165,7 @@ def compute_nz_histogram(
 ) -> ArtifactResult:
     """Compute a redshift histogram n(z) from a galaxy catalog.
 
-    Tier-2 summary statistic. Weights are applied if WEIGHT_TOTAL column exists.
+    Summary statistic of the catalog. Weights are applied if WEIGHT_TOTAL column exists.
     If catalog_key is a DESI catalog, also fetches the official n(z) for comparison.
     """
     import pandas as pd
@@ -204,7 +204,7 @@ def compute_nz_histogram(
     )
 
 
-@tier(2)
+@data_kind("summary_statistic")
 @validate_call
 def fetch_published_multipoles(
     output_dir: Annotated[str, Field(description="Directory for output files.")],
@@ -215,9 +215,9 @@ def fetch_published_multipoles(
 ) -> ArtifactResult:
     """Fetch released P(k) or xi(s) multipoles and covariances from BOSS DR12 or eBOSS DR16.
 
-    These are tier-2 summary statistics measured by the survey teams and published
+    These are summary statistics measured by the survey teams and published
     alongside the BAO/RSD papers. Use for comparison with your own measurements
-    from tier-1 catalogs, or as direct inputs to cosmological fits.
+    from the clustering catalogs, or as direct inputs to cosmological fits.
     """
     if dataset not in _PUBLISHED_KEYS:
         raise ValueError(f"Unknown dataset {dataset!r}. Choose from: {_PUBLISHED_KEYS}")
@@ -241,7 +241,7 @@ def fetch_published_multipoles(
     )
 
 
-@tier(2)
+@data_kind("summary_statistic")
 @validate_call
 def plot_clustering_multipoles(
     output_dir: Annotated[str, Field(description="Directory for output files.")],
