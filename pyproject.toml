@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "galaxy-surveys-mcp-server"
+version = "0.1.0"
+description = "MCP server for spectroscopic galaxy surveys: BAO/RSD compilations (DESI DR2/DR1, eBOSS DR16, BOSS DR12, 6dFGS, SDSS MGS) with fits and plots, plus SDSS SkyServer and GSWLC-A2 galaxy-catalog tools."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "mcp[cli]>=1.27,<2",
+    "pydantic>=2,<3",
+    "numpy",
+    "scipy",
+    "matplotlib>=3.8",
+    "pandas>=2",
+    "astropy>=6",
+    "astroquery>=0.4.7",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "anyio", "ruff"]
+# hpc = ["hep-genesis[iri]"]  # server-side dispatch: pip install -e <hep-genesis-agent>/backend[iri]
+
+[tool.mcp-server]
+name = "Galaxy Surveys (BAO/RSD + SDSS) MCP Server"
+skill_prefix = "galaxy"
+instructions_file = "mcp_server/INSTRUCTIONS.md"
+tool_modules = [
+    "tools.meta",
+    "tools.bao",
+    "tools.sdss",
+    "tools.gswlc",
+    "mcp_server.dispatch",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["mcp_server*", "tools*"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+markers = ["network: needs internet (deselect with -m 'not network')"]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B"]
+ignore = ["E501", "B008"]
