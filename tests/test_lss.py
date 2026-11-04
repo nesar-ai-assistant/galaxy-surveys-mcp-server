@@ -1,4 +1,3 @@
-import pytest
 """Tests for the LSS clustering tool family.
 
 Offline tests that don't require network access: unit-test the kernel,
@@ -11,6 +10,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import pytest
 
 
 # ---------- kernel unit test (no network) -------------------------------------
