@@ -138,7 +138,9 @@ def measure_xi_multipoles(
                     valid = (s_idx >= 0) & (s_idx < len(s_edges) - 1)
                     ww = w1[idx] * w2[nbrs[valid]]
                     np.add.at(counts, (s_idx[valid], mu_idx[valid]), ww)
-            return counts
+            # Auto-counts above visit each unordered pair once; Corrfunc (autocorr=1) and the
+            # normalisation below (f = Nd/Nr, i.e. ordered pairs ~ N^2) count both orderings.
+            return 2.0 * counts if auto else counts
 
         dd_w = weighted_pair_counts_smu(dx, dy, dz, data_weight,
                                         dx, dy, dz, data_weight,

@@ -1,3 +1,4 @@
+import pytest
 """Tests for the LSS clustering tool family.
 
 Offline tests that don't require network access: unit-test the kernel,
@@ -50,10 +51,28 @@ def test_measure_xi_multipoles_synthetic():
     assert result["n_data"] == n_data
     assert result["n_rand"] == n_rand
 
-    # Unclustered data: xi0 should be near zero (within ~0.5 for small samples)
+    # Unclustered data: xi0 must be ~0 (a pair-normalisation bug gives ~ -1 or -2)
     xi0 = np.array(result["xi0"])
-    # At least most bins should be within +/- 1.0
-    assert np.median(np.abs(xi0)) < 1.0, f"xi0 too large for unclustered data: {xi0}"
+    assert np.median(np.abs(xi0)) < 0.1, f"xi0 too large for unclustered data: {xi0}"
+
+
+def test_xi_fallback_matches_corrfunc():
+    """The scipy pair counter must agree with Corrfunc (same pair-count convention)."""
+    pytest.importorskip("Corrfunc")
+    from tools.lss.kernels import measure_xi_multipoles
+
+    rng = np.random.default_rng(7)
+
+    def cat(n):
+        return [rng.uniform(180, 184, n).tolist(), rng.uniform(20, 24, n).tolist(),
+                rng.uniform(0.4, 0.6, n).tolist(), rng.uniform(0.5, 1.5, n).tolist()]
+
+    d, r = cat(1500), cat(4500)
+    kw = dict(s_bins_min=20, s_bins_max=120, n_s_bins=5)
+    a = measure_xi_multipoles(*d, *r, use_corrfunc=True, **kw)
+    b = measure_xi_multipoles(*d, *r, use_corrfunc=False, **kw)
+    assert a["used_corrfunc"] and not b["used_corrfunc"]
+    np.testing.assert_allclose(a["xi0"], b["xi0"], atol=0.01)
 
 
 # ---------- catalog registry --------------------------------------------------
