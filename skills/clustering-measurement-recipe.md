@@ -42,6 +42,10 @@ Uses Corrfunc if available, scipy cKDTree fallback otherwise.
 Can be dispatched to HPC via `set_dispatch("polaris")`.
 
 ### Sanity checks:
+- **Validated (eBOSS DR16 LRG NGC, all 107,500 galaxies + 500k randoms, Om=0.31):** against
+  Bautista+21 (NGC+SGC) the measured xi_0 is 0.96x the published value at 20-60 Mpc/h;
+  diagonal chi^2 over 10-150 Mpc/h is 41/28 (xi_0) and 51/28 (xi_2), with errors inflated by
+  sqrt(1.43) for NGC only. Uses Corrfunc's mocks pair counter (pair-midpoint line of sight).
 - **BOSS CMASS**: BAO bump near s ~ 100-110 Mpc/h in xi_0;
   xi_0(s=20 Mpc/h) of order 0.1-0.3
 - **eBOSS LRG**: similar BAO feature but noisier for small subsets

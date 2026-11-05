@@ -49,7 +49,7 @@ def measure_xi_multipoles(
     z_grid = np.linspace(0, max(data_z.max(), rand_z.max()) * 1.05, 2000)
     Ode = 1.0 - cosmology_Om
     Ez = np.sqrt(cosmology_Om * (1 + z_grid)**3 + Ode)
-    chi_grid = cumulative_trapezoid(1.0 / Ez, z_grid, initial=0) * C_KM_S / (100.0 * cosmology_h)  # Mpc/h
+    chi_grid = cumulative_trapezoid(1.0 / Ez, z_grid, initial=0) * C_KM_S / 100.0  # Mpc/h (h-independent)
 
     data_chi = np.interp(data_z, z_grid, chi_grid)
     rand_chi = np.interp(rand_z, z_grid, chi_grid)
@@ -73,26 +73,22 @@ def measure_xi_multipoles(
     corrfunc_ok = False
     if use_corrfunc:
         try:
-            from Corrfunc.theory.DDsmu import DDsmu
+            from Corrfunc.mocks.DDsmu_mocks import DDsmu_mocks  # noqa: F401  (availability check)
             corrfunc_ok = True
         except ImportError:
             pass
 
     if corrfunc_ok:
-        from Corrfunc.theory.DDsmu import DDsmu
+        # Survey geometry: use the mocks pair counter, whose line of sight is the pair midpoint
+        # direction (Corrfunc.theory.DDsmu takes the z-axis as LOS, which washes out xi_2).
+        from Corrfunc.mocks.DDsmu_mocks import DDsmu_mocks
         nthreads = 2
-
-        dd = DDsmu(1, nthreads, s_edges, 1.0, n_mu_bins,
-                   dx, dy, dz, weights1=data_weight, weight_type="pair_product",
-                   periodic=False, output_savg=True)
-        dr = DDsmu(0, nthreads, s_edges, 1.0, n_mu_bins,
-                   dx, dy, dz, weights1=data_weight,
-                   X2=rx, Y2=ry, Z2=rz, weights2=rand_weight,
-                   weight_type="pair_product",
-                   periodic=False, output_savg=True)
-        rr = DDsmu(1, nthreads, s_edges, 1.0, n_mu_bins,
-                   rx, ry, rz, weights1=rand_weight, weight_type="pair_product",
-                   periodic=False, output_savg=True)
+        common = dict(cosmology=1, nthreads=nthreads, mu_max=1.0, nmu_bins=n_mu_bins, binfile=np.concatenate([[max(s_edges[0], 1e-3)], s_edges[1:]]),
+                      is_comoving_dist=True, weight_type="pair_product", output_savg=False)
+        dd = DDsmu_mocks(autocorr=1, RA1=data_ra, DEC1=data_dec, CZ1=data_chi, weights1=data_weight, **common)
+        dr = DDsmu_mocks(autocorr=0, RA1=data_ra, DEC1=data_dec, CZ1=data_chi, weights1=data_weight,
+                         RA2=rand_ra, DEC2=rand_dec, CZ2=rand_chi, weights2=rand_weight, **common)
+        rr = DDsmu_mocks(autocorr=1, RA1=rand_ra, DEC1=rand_dec, CZ1=rand_chi, weights1=rand_weight, **common)
 
         # Reshape to (n_s_bins, n_mu_bins) and compute Landy-Szalay per (s, mu)
         dd_w = np.array([d["weightavg"] * d["npairs"] for d in dd]).reshape(n_s_bins, n_mu_bins)

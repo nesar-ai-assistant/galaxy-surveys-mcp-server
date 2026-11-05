@@ -275,9 +275,17 @@ def download_lss_subset(catalog_key: str,
         header, d0 = _fits_header_range(url)
         dt = _fits_dtype(header)
         total_rows = header["NAXIS2"]
-        # Read a contiguous block (random catalogs are pre-shuffled for eBOSS)
+        # Catalog files are ordered (by sky position / chunk), so a contiguous head block
+        # covers a different footprint for data and randoms and biases xi(s) (constant
+        # offset at large s). Read evenly spaced blocks spanning the whole file instead.
         read_n = min(total_rows, int(max_rows / max(random_fraction, 0.01) * 1.5))
-        arr = read_fits_rows_range(url, 0, read_n, header, d0, dt)
+        if read_n >= total_rows:
+            arr = read_fits_rows_range(url, 0, total_rows, header, d0, dt)
+        else:
+            n_blocks = int(min(128, max(1, read_n // 500)))
+            per = read_n // n_blocks
+            starts = np.linspace(0, total_rows - per, n_blocks).astype(int)
+            arr = np.concatenate([read_fits_rows_range(url, int(s0), per, header, d0, dt) for s0 in starts])
 
     # Build DataFrame with only the columns we want
     available = set(dt.names)
@@ -295,9 +303,9 @@ def download_lss_subset(catalog_key: str,
         n_keep = max(1, int(len(df) * random_fraction))
         df = df.sample(n=min(n_keep, len(df)), random_state=42)
 
-    # Row limit
+    # Row limit (random subsample, not head, to keep the footprint uniform)
     if len(df) > max_rows:
-        df = df.iloc[:max_rows]
+        df = df.sample(n=max_rows, random_state=0)
 
     df = df.reset_index(drop=True)
 
