@@ -2,7 +2,7 @@
 
 Euclid DR1-Foundation (public 2026-11-12; ~1900 deg^2 Wide Survey) provides
 object catalogues: MER photometry, photometric redshifts, NISP spectroscopic
-redshifts and classifications. It does NOT contain cosmology-level summary
+redshifts and classifications. It does NOT contain cosmological summary
 statistics (cosmic-shear / clustering 2-pt functions, covariances); those are
 expected with 'DR1 Complete' (mid-2027). These tools therefore return
 catalogs only.

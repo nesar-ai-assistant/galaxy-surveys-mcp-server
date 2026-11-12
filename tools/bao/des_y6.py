@@ -94,12 +94,12 @@ def load_profile(variant: str = "fid") -> dict:
     }
 
 
-def _crossing(x, y, imin, level):
-    """Linear-interpolated points where y crosses ``level`` either side of imin."""
+def _crossing(x, y, imin, thresh):
+    """Linear-interpolated points where y crosses ``thresh`` either side of imin."""
     def side(idx):
         for a, b in zip(idx[:-1], idx[1:], strict=False):
-            if y[a] < level <= y[b]:
-                return float(x[a] + (level - y[a]) * (x[b] - x[a]) / (y[b] - y[a]))
+            if y[a] < thresh <= y[b]:
+                return float(x[a] + (thresh - y[a]) * (x[b] - x[a]) / (y[b] - y[a]))
         return float(x[idx[-1]])
     return side(list(range(imin, -1, -1))), side(list(range(imin, len(x))))
 
