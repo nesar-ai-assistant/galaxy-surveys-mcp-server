@@ -39,3 +39,11 @@ Small canonical tables from the CobayaSampler/bao_data repository
 
 ### SDSS DR7 MGS
 - `sdss_MGS_prob.txt` — 1D probability distribution for DV/rs at z=0.15
+
+### DES Y6 angular BAO (`bao/des_y6/`)
+- `likelihood_{fid,acf,aps,pcf}.txt` — Δχ²(α) profiles from the DES Y6 BAO public release
+  (Likelihood/DESY6BAO_likelihood.zip, https://desdr-server.ncsa.illinois.edu/despublic/y6a2_files/y6_bao/;
+  DES Collaboration, arXiv:2402.10696). fid = ACF+APS+PCF consensus.
+- `likelihood_DESY6_{DR1tiles,deccut}_noDESI.csv` — DESI-overlap-removed profiles
+  (Mena-Fernandez et al., arXiv:2601.14864; from cosmosis-standard-library likelihood/bao/des/y6-no-desi).
+- `README_likelihood_release.md` — the release README.

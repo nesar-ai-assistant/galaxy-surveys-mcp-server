@@ -83,6 +83,24 @@ def _comoving_integral(z, Om, w0=-1.0, wa=0.0, npts=500):
     return _trapz(integrand, zz)
 
 
+# --------------- non-Gaussian chi2(alpha) profiles ---------------
+
+def _profile_chi2(profiles, Om, H0rd, w0=-1.0, wa=0.0):
+    """Sum of tabulated chi2(alpha) profiles (e.g. DES Y6 angular BAO).
+
+    Each profile is a JSON dict {z, observable, fid, alpha, chi2}: alpha is
+    the observable divided by its fiducial value ``fid`` and chi2 is the
+    released profile (min-subtracted). Outside the tabulated range the edge
+    value is used, as in the official CosmoSIS module.
+    """
+    total = 0.0
+    for p in profiles or []:
+        th = _theory_vec([p["z"]], [p["observable"]], Om, H0rd, w0, wa)[0]
+        a = th / p["fid"]
+        total += float(np.interp(a, p["alpha"], p["chi2"], left=p["chi2"][0], right=p["chi2"][-1]))
+    return total
+
+
 # --------------- main kernel ---------------
 
 def fit_bao(z_arr, obs_arr, data_vec, cov_mat,
@@ -90,7 +108,7 @@ def fit_bao(z_arr, obs_arr, data_vec, cov_mat,
             Om_range=(0.1, 0.6), H0rd_range=(90, 115),
             w0_range=(-2.0, 0.0), wa_range=(-3.0, 2.0),
             n_grid_Om=80, n_grid_H0rd=80, n_grid_w=30,
-            cmb_prior=None, sn_prior=None):
+            cmb_prior=None, sn_prior=None, profiles=None):
     """Chi-squared grid fit of BAO data.
 
     Parameters
@@ -100,12 +118,16 @@ def fit_bao(z_arr, obs_arr, data_vec, cov_mat,
     fit_w0wa : bool — if True, scan (Om, H0*rd, w0, wa) with optional priors
     cmb_prior : dict {"Om": [mean,sigma], "H0rd": [mean,sigma]} or None
     sn_prior : dict {"w0": [mean,sigma], "wa": [mean,sigma]} or None
+    profiles : list of {z, observable, fid, alpha, chi2} tabulated chi2(alpha)
+        likelihoods added to the Gaussian chi2 (e.g. DES Y6 angular BAO).
+        The Gaussian part may be empty (profiles only).
     Returns dict with best_fit, grid arrays, chi2_min, marginalised 1D.
     """
     z_arr = np.asarray(z_arr, dtype=float)
     data_vec = np.asarray(data_vec, dtype=float)
-    cov_mat = np.asarray(cov_mat, dtype=float)
-    icov = np.linalg.inv(cov_mat)
+    cov_mat = np.asarray(cov_mat, dtype=float).reshape(len(data_vec), len(data_vec))
+    icov = np.linalg.inv(cov_mat) if len(data_vec) else np.zeros((0, 0))
+    n_data = len(data_vec) + len(profiles or [])
 
     Om_grid = np.linspace(*Om_range, n_grid_Om)
     H0rd_grid = np.linspace(*H0rd_range, n_grid_H0rd)
@@ -116,7 +138,7 @@ def fit_bao(z_arr, obs_arr, data_vec, cov_mat,
             for j, H0rd in enumerate(H0rd_grid):
                 th = _theory_vec(z_arr, obs_arr, Om, H0rd)
                 diff = data_vec - th
-                chi2[i, j] = diff @ icov @ diff
+                chi2[i, j] = diff @ icov @ diff + _profile_chi2(profiles, Om, H0rd)
                 if cmb_prior:
                     if "Om" in cmb_prior:
                         m, s = cmb_prior["Om"]
@@ -154,7 +176,7 @@ def fit_bao(z_arr, obs_arr, data_vec, cov_mat,
                 "H0rd_sigma": round(float(np.sqrt(H0rd_var)), 3),
             },
             "chi2_min": round(chi2_min, 3),
-            "ndof": len(data_vec) - 2,
+            "ndof": n_data - 2,
             "Om_grid": Om_grid.tolist(),
             "H0rd_grid": H0rd_grid.tolist(),
             "chi2_grid": chi2.tolist(),
@@ -174,7 +196,7 @@ def fit_bao(z_arr, obs_arr, data_vec, cov_mat,
                     for wa_v in wa_grid:
                         th = _theory_vec(z_arr, obs_arr, Om, H0rd, w0, wa_v)
                         diff = data_vec - th
-                        c2 = float(diff @ icov @ diff)
+                        c2 = float(diff @ icov @ diff) + _profile_chi2(profiles, Om, H0rd, w0, wa_v)
                         if cmb_prior:
                             if "Om" in cmb_prior:
                                 m, s = cmb_prior["Om"]
@@ -201,7 +223,7 @@ def fit_bao(z_arr, obs_arr, data_vec, cov_mat,
             "model": "w0waCDM",
             "best_fit": {k: round(float(v), 5) for k, v in best_overall.items()},
             "chi2_min": round(float(chi2_min), 3),
-            "ndof": len(data_vec) - 4,
+            "ndof": n_data - 4,
             "Om_grid": Om_grid.tolist(),
             "H0rd_grid": H0rd_grid.tolist(),
             "chi2_grid": chi2_marg.tolist(),

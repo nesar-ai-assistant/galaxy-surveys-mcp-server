@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "galaxy-surveys-mcp-server"
 version = "0.1.0"
-description = "MCP server for spectroscopic galaxy surveys: BAO/RSD compilations (DESI DR2/DR1, eBOSS DR16, BOSS DR12, 6dFGS, SDSS MGS) with fits and plots, plus SDSS SkyServer and GSWLC-A2 galaxy-catalog tools."
+description = "MCP server for spectroscopic galaxy surveys: BAO/RSD compilations (DESI DR2/DR1, eBOSS DR16, BOSS DR12, 6dFGS, SDSS MGS) and DES Y6 angular BAO with fits and plots, plus SDSS SkyServer, GSWLC-A2 and Euclid DR1 (incl. ECLIPSE strong lenses) galaxy-catalog tools."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
@@ -16,7 +16,7 @@ dependencies = [
     "matplotlib>=3.8",
     "pandas>=2",
     "astropy>=6",
-    "astroquery>=0.4.7",
+    "astroquery>=0.4.10",
 ]
 
 [project.optional-dependencies]
@@ -34,6 +34,7 @@ tool_modules = [
     "tools.sdss",
     "tools.gswlc",
     "tools.lss",
+    "tools.euclid",
     "mcp_server.dispatch",
 ]
 

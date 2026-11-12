@@ -1,0 +1,1 @@
+This directory contains the goodness of fit ($\\Delta\\chi^2$) as a function of the dilation parameter $\\alpha = (D_M/r_d)/(D_M/r_d)\_{Planck}$ with $(D_M/r_d)\_{Planck} = 20.38$, where $D_M$ is evaluated at $z\_{eff}=0.851$.

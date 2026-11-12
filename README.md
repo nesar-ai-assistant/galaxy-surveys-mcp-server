@@ -27,6 +27,25 @@ Every tool declares the kind of data it works on with `@data_kind(...)` (`catalo
 - `plot_bao_contours` — Om-H0*rd contour plot from fit grid
 - `plot_fsigma8` — f*sigma8(z) growth-rate measurements
 - `compare_bao_surveys` — residuals vs Planck LCDM across surveys *(published Planck reference, for comparison only)*
+- `fetch_des_y6_bao_likelihood` — DES Y6 angular BAO Δχ²(α) profile (non-Gaussian) at z_eff = 0.851:
+  consensus / ACF / APS / PCF and the DESI-overlap-removed (`nodesi_dr1tiles`, `nodesi_deccut`) variants
+- `fetch_des_y6_clustering` — DES Y6 BAO w(θ), C_ℓ, ξ_p(s_⊥) data vectors (6 z-bins) + covariance
+  (downloaded from the DES public release, cached)
+
+Joint fits: `fit_bao_cosmology(datasets=["desi_dr2", "des_y6_nodesi"])` combines the
+Gaussian DESI likelihood with the exact DES Y6 χ²(α) profile. DES Y6 overlaps the DESI
+footprint, so use `des_y6_nodesi` with DESI. `des_y6` with DESI still runs but returns a warning.
+
+### Euclid DR1 (`tools/euclid/`) — galaxy catalogs
+- `fetch_euclid_catalog` — photometric (MER × photo-z) or spectroscopic (MER × NISP z) Wide-Survey
+  galaxies in a cone or box. Queries the ESA Euclid Science Archive anonymously via `astroquery.esa.euclid`,
+  with a plain TAP fallback. Quality cuts: VIS mag, galaxy class, `spe_z_prob`, `phz_flags`.
+  Server-side TOP plus a deterministic 1-in-N subsample. Outputs CSV/parquet, a summary JSON with the ADQL, and n(z).
+- `fetch_euclid_strong_lenses` — ECLIPSE DR1 strong-lens catalogue (Zenodo 19654904; 26 662 graded
+  systems), filtered by expert grade/score, ensemble score, DESI deflector z, and cone.
+
+DR1-Foundation (2026-11-12) holds **catalogues only**. Shear 2-pt functions, clustering
+measurements and covariances are expected with "DR1 Complete" (mid-2027).
 
 ### SDSS (`tools/sdss/`) — galaxy catalogs
 - `sdss_sql_query` — execute SQL on SDSS SkyServer DR18
@@ -85,3 +104,10 @@ LSS clustering catalogs download on demand from SDSS SAS (DR12/DR16) and
 DESI data server (DR1); only subsets are fetched (row-limited, z-range filtered).
 Published multipoles from BOSS DR12 (Beutler et al. 2017) and eBOSS DR16
 (Alam et al. 2021) data vector archives.
+
+DES Y6 BAO comes from the DES public release
+(https://desdr-server.ncsa.illinois.edu/despublic/y6a2_files/y6_bao/; DES Collaboration,
+arXiv:2402.10696). The χ²(α) profiles are bundled in `data/bao/des_y6/`, including the no-DESI
+profiles of Mena-Fernandez et al., arXiv:2601.14864. Data vectors and covariances download on demand.
+Euclid DR1 is queried live from https://eas.esac.esa.int/tap-server/tap.
+ECLIPSE downloads once from Zenodo (3.7 MB).
