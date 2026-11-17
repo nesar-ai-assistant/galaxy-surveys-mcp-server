@@ -93,7 +93,19 @@ MPLBACKEND=Agg .venv/bin/python -m pytest -q
 
 ## Sample Figures
 
-See `docs/figures/` for example outputs from the tour.
+All figures are produced by the server's own tools; regenerate them with
+`MPLBACKEND=Agg .venv/bin/python scripts/make_readme_figures.py` (more examples in `docs/figures/`).
+
+| | |
+|---|---|
+| ![BAO distances](docs/figures/bao_distances.png) | ![DESI DR2 + DES Y6 BAO contours](docs/figures/bao_contours_desi_dr2_des_y6.png) |
+| **BAO distance ladder** (`plot_bao_distances`): DESI DR2/DR1, BOSS DR12, 6dFGS and SDSS MGS against the Planck ΛCDM curve. | **Joint BAO fit** (`fit_bao_cosmology` → `plot_bao_contours`): DESI DR2 + DES Y6 (DESI-overlap removed), Ωm = 0.297 ± 0.009, H₀r_d = 101.6 ± 0.7 km/s. |
+| ![DES Y6 BAO likelihood](docs/figures/des_y6_bao_chi2.png) | ![DES Y6 w(theta)](docs/figures/des_y6_wtheta.png) |
+| **DES Y6 angular BAO** (`fetch_des_y6_bao_likelihood`): the released non-Gaussian Δχ²(α) profiles; consensus α = 0.957 ± 0.020, D_M/r_d(0.851) = 19.51 ± 0.41. | **DES Y6 BAO data vectors** (`fetch_des_y6_clustering`): θ²w(θ) in the 6 photometric redshift bins with the released covariance. |
+| ![eBOSS LRG multipoles](docs/figures/eboss_dr16_lrg_xi_multipoles_vs_bautista21.png) | ![Euclid ECLIPSE lenses](docs/figures/euclid_eclipse_lenses.png) |
+| **ξ₀, ξ₂ measured from catalogs** (`measure_correlation_multipoles`): eBOSS DR16 LRG vs Bautista et al. 2021. | **Euclid DR1 strong lenses** (`fetch_euclid_strong_lenses`): ECLIPSE grade A+B candidates (sky map and expert-score distribution). |
+| ![f sigma8](docs/figures/fsigma8.png) | ![SFMS](docs/figures/sfms.png) |
+| **Growth rate** (`plot_fsigma8`): fσ₈(z) compilation vs Planck ΛCDM. | **Star-forming main sequence** (`plot_star_forming_main_sequence`): GSWLC-A2. |
 
 ## Data
 
