@@ -106,6 +106,8 @@ All figures are produced by the server's own tools; regenerate them with
 | **ξ₀, ξ₂ measured from catalogs** (`measure_correlation_multipoles`): eBOSS DR16 LRG vs Bautista et al. 2021. | **Euclid DR1 strong lenses** (`fetch_euclid_strong_lenses`): ECLIPSE grade A+B candidates (sky map and expert-score distribution). |
 | ![f sigma8](docs/figures/fsigma8.png) | ![SFMS](docs/figures/sfms.png) |
 | **Growth rate** (`plot_fsigma8`): fσ₈(z) compilation vs Planck ΛCDM. | **Star-forming main sequence** (`plot_star_forming_main_sequence`): GSWLC-A2. |
+| ![Euclid DR1 spectroscopic n(z)](docs/figures/euclid_dr1_spectroscopic_nz.png) | ![Euclid DR1 photometric n(z)](docs/figures/euclid_dr1_photometric_nz.png) |
+| **Euclid DR1 spectroscopic sample** (`fetch_euclid_catalog`): 4,360 NISP galaxies (spe_z_prob ≥ 0.99, VIS < 24.5) in a 0.3° cone at (80.3°, −51.25°); median z = 1.30. | **Euclid DR1 photometric sample** (`fetch_euclid_catalog`): 2,803 galaxies with photo-z in a 0.2° × 0.2° box; median z = 0.84. |
 
 ## Data
 
